@@ -51,13 +51,3 @@ class _MyHomePageState extends State<MyHomePage> {
   return ListAdd;
 }
 }
-
-
-
-// Container(color: Colors.redAccent, height: 100),
-//           Container(color: Colors.orangeAccent, height: 100),
-//           Container(color: Colors.yellowAccent, height: 100),
-//           Container(color: Colors.greenAccent, height: 100),
-//           Container(color: Colors.blueAccent, height: 100),
-//           Container(color: Colors.blueGrey, height: 100),
-//           Container(color: Colors.purpleAccent, height: 100),
