@@ -14,6 +14,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String delid = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
-        Expanded(child: memoBuilder())
+        Expanded(child: memoBuilder(context))
       ]),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -54,7 +55,43 @@ class _MyHomePageState extends State<MyHomePage> {
     return await sd.memos();
   }
 
-  Widget memoBuilder() {
+  Future<void> delMemo(String id) async {
+    DBHelper sd = DBHelper();
+    await sd.deleteMemo(id);
+  }
+
+  void showAlertDialog(BuildContext context) async {
+    String result = await showDialog(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('삭제 경고'),
+          content: Text("삭제하시겠습니까?\n 삭제된 메모는 복구되지 않습니다."),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('삭제'),
+              onPressed: () {
+                Navigator.pop(context, "삭제");
+                setState(() {
+                  delMemo(delid);
+                  delid = "";
+                });
+              },
+            ),
+            FlatButton(
+              child: Text('취소'),
+              onPressed: () {
+                Navigator.pop(context, "취소");
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget memoBuilder(BuildContext parentContext) {
     return FutureBuilder(
       builder: (context, projectSnap) {
         if (projectSnap.data.isEmpty) {
@@ -72,46 +109,56 @@ class _MyHomePageState extends State<MyHomePage> {
           itemCount: projectSnap.data.length,
           itemBuilder: (context, index) {
             Memo memo = projectSnap.data[index];
-            return Container(
-              padding: EdgeInsets.all(15),
-              margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
-              height: 120,
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.blue, width: 1),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [BoxShadow(color: Colors.lightBlue, blurRadius: 3)]
-                  ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [  
-                      Text(
-                        memo.title,
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w500),
-                      ),
-                      Text(
-                        memo.text,
-                        style: TextStyle(fontSize: 15),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        '최종 수정 시간:' + memo.editTime.split('.')[0],
-                        style: TextStyle(fontSize: 11),
-                        textAlign: TextAlign.end,
-                      )
-                    ],
-                  )
-                  // Widget to display the list of project
-                ],
+            return InkWell(
+              onTap: () {
+                print(memo.id);
+              },
+              onLongPress: () {
+                delid = memo.id;
+                showAlertDialog(parentContext);
+              },
+              child: Container(
+                padding: EdgeInsets.all(15),
+                margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                height: 120,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.blue, width: 1),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(color: Colors.lightBlue, blurRadius: 3)
+                    ]),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          memo.title,
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w500),
+                        ),
+                        Text(
+                          memo.text,
+                          style: TextStyle(fontSize: 15),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          '최종 수정 시간:' + memo.editTime.split('.')[0],
+                          style: TextStyle(fontSize: 11),
+                          textAlign: TextAlign.end,
+                        )
+                      ],
+                    )
+                    // Widget to display the list of project
+                  ],
+                ),
               ),
             );
           },
