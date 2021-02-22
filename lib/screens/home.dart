@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:memoapp/screens/edit.dart';
+import 'package:memoapp/database/db.dart';
+import 'package:memoapp/database/memo.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -15,23 +17,16 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        physics: BouncingScrollPhysics(),
-        children: [
-          Row(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(left: 20, top: 20, bottom: 20),
-                child: Text(
-                  'Memo App',
-                  style: TextStyle(fontSize: 30, color: Colors.blue),
-                ),
-              )
-            ],
+      body: Column(children: [
+        Padding(
+          padding: EdgeInsets.only(left: 20, top: 20, bottom: 20),
+          child: Text(
+            'Memo App',
+            style: TextStyle(fontSize: 30, color: Colors.blue),
           ),
-          ...Loadlist()
-        ],
-      ),
+        ),
+        Expanded(child: memoBuilder(),)
+      ]),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.push(
@@ -45,9 +40,44 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   List<Widget> Loadlist() {
-  List<Widget> ListAdd = [] ; 
-  ListAdd.add(Container(color: Colors.redAccent, height: 100));
-  ListAdd.add(Container(color: Colors.purpleAccent, height: 100));
-  return ListAdd;
-}
+    List<Widget> ListAdd = [];
+    ListAdd.add(Container(color: Colors.redAccent, height: 100));
+    ListAdd.add(Container(color: Colors.purpleAccent, height: 100));
+    return ListAdd;
+  }
+
+  Future<List<Memo>> loadMemo() async {
+    DBHelper sd = DBHelper();
+    var fido = await sd.memos();
+    return fido;
+  }
+
+  Widget memoBuilder() {
+    return FutureBuilder(
+      builder: (context, projectSnap) {
+        if (projectSnap.connectionState == ConnectionState.none &&
+            projectSnap.hasData == null) {
+          //print('project snapshot data is: ${projectSnap.data}');
+          return Container(
+            child: Text('메모를 작성하세요'),
+          );
+        }
+        return ListView.builder(
+          itemCount: projectSnap.data.length,
+          itemBuilder: (context, index) {
+            Memo memo = projectSnap.data[index];
+            return Column(
+              children: <Widget>[
+                Text(memo.title),
+                Text(memo.text),
+                Text(memo.editTime)
+                // Widget to display the list of project
+              ],
+            );
+          },
+        );
+      },
+      future: loadMemo(),
+    );
+  }
 }
