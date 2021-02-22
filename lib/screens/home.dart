@@ -19,13 +19,16 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: Column(children: [
         Padding(
-          padding: EdgeInsets.only(left: 20, top: 20, bottom: 20),
-          child: Text(
-            'Memo App',
-            style: TextStyle(fontSize: 30, color: Colors.blue),
+          padding: EdgeInsets.only(left: 20, top: 40, bottom: 20),
+          child: Container(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Memo App',
+              style: TextStyle(fontSize: 30, color: Colors.blue),
+            ),
           ),
         ),
-        Expanded(child: memoBuilder(),)
+        Expanded(child: memoBuilder())
       ]),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -39,40 +42,77 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  List<Widget> Loadlist() {
-    List<Widget> ListAdd = [];
-    ListAdd.add(Container(color: Colors.redAccent, height: 100));
-    ListAdd.add(Container(color: Colors.purpleAccent, height: 100));
-    return ListAdd;
+  List<Widget> LoadMemo() {
+    List<Widget> listAdd = [];
+    listAdd.add(Container(color: Colors.redAccent, height: 100));
+    listAdd.add(Container(color: Colors.purpleAccent, height: 100));
+    return listAdd;
   }
 
   Future<List<Memo>> loadMemo() async {
     DBHelper sd = DBHelper();
-    var fido = await sd.memos();
-    return fido;
+    return await sd.memos();
   }
 
   Widget memoBuilder() {
     return FutureBuilder(
       builder: (context, projectSnap) {
-        if (projectSnap.connectionState == ConnectionState.none &&
-            projectSnap.hasData == null) {
-          //print('project snapshot data is: ${projectSnap.data}');
+        if (projectSnap.data.isEmpty) {
           return Container(
-            child: Text('메모를 작성하세요'),
+            alignment: Alignment.center,
+            child: Text(
+              '메모를 작성하세요\n\n\n\n',
+              style: TextStyle(fontSize: 25, color: Colors.blue[700]),
+            ),
           );
         }
         return ListView.builder(
+          padding: EdgeInsets.all(20),
+          physics: BouncingScrollPhysics(),
           itemCount: projectSnap.data.length,
           itemBuilder: (context, index) {
             Memo memo = projectSnap.data[index];
-            return Column(
-              children: <Widget>[
-                Text(memo.title),
-                Text(memo.text),
-                Text(memo.editTime)
-                // Widget to display the list of project
-              ],
+            return Container(
+              padding: EdgeInsets.all(15),
+              margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
+              height: 120,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: Colors.blue, width: 1),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [BoxShadow(color: Colors.lightBlue, blurRadius: 3)]
+                  ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [  
+                      Text(
+                        memo.title,
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w500),
+                      ),
+                      Text(
+                        memo.text,
+                        style: TextStyle(fontSize: 15),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        '최종 수정 시간:' + memo.editTime.split('.')[0],
+                        style: TextStyle(fontSize: 11),
+                        textAlign: TextAlign.end,
+                      )
+                    ],
+                  )
+                  // Widget to display the list of project
+                ],
+              ),
             );
           },
         );
