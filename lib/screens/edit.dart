@@ -4,13 +4,20 @@ import 'package:memoapp/database/db.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert'; // for the utf8.encode method
 
-class EditPage extends StatelessWidget {
+class EditPage extends StatefulWidget {
+  @override
+  _EditPageState createState() => _EditPageState();
+}
+
+class _EditPageState extends State<EditPage> {
   String title = '';
+
   String text = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
         appBar: AppBar(
           actions: [
             IconButton(icon: const Icon(Icons.delete), onPressed: () {}),
@@ -18,6 +25,7 @@ class EditPage extends StatelessWidget {
                 icon: const Icon(Icons.save),
                 onPressed: () {
                   saveDB();
+                  Navigator.pop(context);
                 })
           ],
         ),
@@ -41,7 +49,7 @@ class EditPage extends StatelessWidget {
                 },
                 decoration: InputDecoration(hintText: '내용을 쓰세요'),
                 keyboardType: TextInputType.multiline,
-                maxLines: null,
+                maxLines: 8,
               )
             ],
           ),
@@ -58,7 +66,6 @@ class EditPage extends StatelessWidget {
         createTime: DateTime.now().toString(),
         editTime: DateTime.now().toString());
     await sd.insertMemo(fido);
-    print(await sd.memos());
   }
 
   String Str512sha(String text) {

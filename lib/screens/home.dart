@@ -34,8 +34,14 @@ class _MyHomePageState extends State<MyHomePage> {
       ]),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
+          print('value');
           Navigator.push(
-              context, CupertinoPageRoute(builder: (context) => EditPage()));
+              context, CupertinoPageRoute(builder: (context) => EditPage()),
+              ).then((value){
+                setState(() {
+                  (){};
+                });
+              });
         },
         tooltip: '메모를 추가하려면 클릭하세요',
         label: Text('메모 추가'),
@@ -88,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget memoBuilder(BuildContext parentContext) {
     return FutureBuilder(
       builder: (context, projectSnap) {
-        if (projectSnap.data.isEmpty) {
+        if(projectSnap?.data?.isEmpty ?? true) {
           return Container(
             alignment: Alignment.center,
             child: Text(
@@ -134,10 +140,12 @@ class _MyHomePageState extends State<MyHomePage> {
                           memo.title,
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.w500),
+                          overflow: TextOverflow.ellipsis
                         ),
                         Text(
                           memo.text,
                           style: TextStyle(fontSize: 15),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
