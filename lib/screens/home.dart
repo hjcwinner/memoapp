@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:memoapp/screens/edit.dart';
 import 'package:memoapp/database/db.dart';
 import 'package:memoapp/database/memo.dart';
+import 'viewpage.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -41,13 +42,6 @@ class _MyHomePageState extends State<MyHomePage> {
         icon: Icon(Icons.add),
       ),
     );
-  }
-
-  List<Widget> LoadMemo() {
-    List<Widget> listAdd = [];
-    listAdd.add(Container(color: Colors.redAccent, height: 100));
-    listAdd.add(Container(color: Colors.purpleAccent, height: 100));
-    return listAdd;
   }
 
   Future<List<Memo>> loadMemo() async {
@@ -111,7 +105,8 @@ class _MyHomePageState extends State<MyHomePage> {
             Memo memo = projectSnap.data[index];
             return InkWell(
               onTap: () {
-                print(memo.id);
+                Navigator.push(parentContext,
+                    CupertinoPageRoute(builder: (context) => ViewPage(id: memo.id)));
               },
               onLongPress: () {
                 delid = memo.id;
